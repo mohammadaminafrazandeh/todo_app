@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:todo_app/bindings/binidings.dart';
+import 'package:todo_app/routes/routes.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,6 +14,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
+      defaultTransition: Transition.fadeIn,
+      getPages: Routes.pages,
+      initialBinding: MyBindings(),
     );
   }
 }
