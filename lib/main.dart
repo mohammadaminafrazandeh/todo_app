@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:todo_app/bindings/binidings.dart';
@@ -20,6 +21,15 @@ class MyApp extends StatelessWidget {
       getPages: Routes.pages,
       initialBinding: MyBindings(),
       initialRoute: '/homescreen',
+    );
+  }
+
+  static void changeColor(Color color, Brightness brightness) {
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        statusBarColor: color,
+        statusBarIconBrightness: brightness,
+      ),
     );
   }
 }
