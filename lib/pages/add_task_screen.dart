@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:todo_app/constant.dart';
+import 'package:todo_app/controllers/task_controller.dart';
+import 'package:todo_app/controllers/textfield_controller.dart';
 import 'package:todo_app/main.dart';
+import 'package:todo_app/models/task_model.dart';
 
 class AddTaskScreen extends StatelessWidget {
   const AddTaskScreen({super.key});
@@ -39,11 +42,35 @@ class MyButton extends StatelessWidget {
       width: Get.width,
       height: 40,
       child: ElevatedButton(
-        onPressed: () {},
+        onPressed: () {
+          if (Get.find<TaskController>().isEditing) {
+            //*Editing
+            var task = Get.find<TaskController>()
+                .tasks[Get.find<TaskController>().index];
+            //
+            task.taskTitle = Get.find<TextfieldController>().taskTitle!.text;
+            task.taskSubtitle =
+                Get.find<TextfieldController>().taskSubtitle!.text;
+            //
+            Get.find<TaskController>().tasks[Get.find<TaskController>().index] =
+                task;
+          } else {
+            //*Adding
+            Get.find<TaskController>().tasks.add(
+                  TaskModel(
+                    taskTitle: Get.find<TextfieldController>().taskTitle!.text,
+                    taskSubtitle:
+                        Get.find<TextfieldController>().taskSubtitle!.text,
+                    status: false,
+                  ),
+                );
+          }
+          Get.back();
+        },
         style: ElevatedButton.styleFrom(
           backgroundColor: KLightBlueColor,
         ),
-        child: const Text('Add'),
+        child: Text(Get.find<TaskController>().isEditing ? 'Edit' : 'Add'),
       ),
     );
   }
@@ -57,13 +84,14 @@ class NoteWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+      margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
       child: TextField(
+        controller: Get.find<TextfieldController>().taskSubtitle,
         maxLength: 30,
         cursorColor: KLightBlueColor,
         decoration: InputDecoration(
           hintText: 'Add note',
-          prefixIcon: Icon(
+          prefixIcon: const Icon(
             Icons.bookmark_border,
             color: Colors.grey,
           ),
@@ -85,6 +113,7 @@ class TaskTextField extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
       child: TextField(
+        controller: Get.find<TextfieldController>().taskTitle,
         maxLines: 6,
         cursorColor: KLightBlueColor,
         cursorHeight: 40,
@@ -136,13 +165,12 @@ class CustomAppBar extends StatelessWidget {
       children: [
         Expanded(
           child: Container(
-            margin: const EdgeInsets.only(left: 45.0),
-            child: const Text(
-              'New Task',
-              style: TextStyle(fontSize: 18),
-              textAlign: TextAlign.center,
-            ),
-          ),
+              margin: const EdgeInsets.only(left: 45.0),
+              child: Text(
+                Get.find<TaskController>().isEditing ? 'Edit Task' : 'New Task',
+                style: const TextStyle(fontSize: 18),
+                textAlign: TextAlign.center,
+              )),
         ),
         Hero(
           tag: 'hero',

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:todo_app/constant.dart';
+import 'package:todo_app/controllers/task_controller.dart';
+import 'package:todo_app/controllers/textfield_controller.dart';
 import 'package:todo_app/main.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -44,18 +46,55 @@ class BottomWidget extends StatelessWidget {
       ),
       child: Padding(
         padding: const EdgeInsets.only(top: 30, left: 30),
-        child: ListView.separated(
+        child: Obx(() => ListView.separated(
             itemBuilder: (context, index) {
+              var task = Get.find<TaskController>()
+                  .tasks[index]; //* desired task based on index
               return ListTile(
-                title: const Text('Title'),
-                subtitle: const Text('Subtitle'),
+                title: Text(task.taskTitle ?? ''),
+                subtitle: Text(task.taskSubtitle ?? ''),
                 trailing: Checkbox(
-                  value: true,
+                  value: task.status,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(5)),
-                  onChanged: (value) {},
+                  onChanged: (value) {
+                    task.status = !task.status!;
+                    Get.find<TaskController>().tasks[index] = task;
+                  },
                 ),
-                onTap: () {},
+                onTap: () {
+                  Get.find<TaskController>().index = index;
+                  Get.find<TaskController>().isEditing = true;
+                  //
+                  Get.find<TextfieldController>().taskTitle!.text =
+                      task.taskTitle!;
+                  //
+                  Get.find<TextfieldController>().taskSubtitle!.text =
+                      task.taskSubtitle!;
+                  //
+                  Get.toNamed('/addtaskscreen');
+                },
+                onLongPress: () {
+                  Get.defaultDialog(
+                      title: 'Warning',
+                      // titleStyle: const TextStyle(fontSize: 10),
+                      middleText: 'Are you sure for deleting the task?',
+                      // middleTextStyle: const TextStyle(fontSize: 10),
+                      backgroundColor: Colors.white,
+                      radius: 15,
+                      textCancel: 'No',
+                      cancelTextColor: Colors.black,
+                      onCancel: () {
+                        Get.back();
+                      },
+                      textConfirm: 'Yes',
+                      confirmTextColor: Colors.white,
+                      onConfirm: () {
+                        Get.find<TaskController>().tasks.removeAt(index);
+                        Get.back();
+                      },
+                      buttonColor: KLightBlueColor);
+                },
               );
             },
             separatorBuilder: (context, index) {
@@ -64,7 +103,7 @@ class BottomWidget extends StatelessWidget {
                 height: 3,
               );
             },
-            itemCount: 5),
+            itemCount: Get.find<TaskController>().tasks.length)),
       ),
     );
   }
@@ -123,11 +162,10 @@ class HeadWidget extends StatelessWidget {
                   ),
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.only(left: 10),
-                child: const Text(
-                  'Tasks',
-                  style: TextStyle(color: Colors.white),
+              Obx(
+                () => Text(
+                  '${Get.find<TaskController>().tasks.length} Tasks ',
+                  style: const TextStyle(color: Colors.white),
                 ),
               ),
             ],
@@ -150,6 +188,11 @@ class FABNewTask extends StatelessWidget {
       elevation: 0,
       heroTag: 'hero',
       onPressed: () {
+        Get.find<TaskController>().isEditing = false;
+        //
+        Get.find<TextfieldController>().taskTitle!.text = '';
+        Get.find<TextfieldController>().taskSubtitle!.text = '';
+        //
         Get.toNamed('/addtaskscreen')!.then(
           (value) {
             MyApp.changeColor(KLightBlueColor, Brightness.light);
