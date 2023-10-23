@@ -9,3 +9,4 @@ class MyBindings implements Bindings {
     Get.put(TextfieldController());
   }
 }
+ 

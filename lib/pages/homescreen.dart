@@ -162,11 +162,15 @@ class HeadWidget extends StatelessWidget {
                   ),
                 ),
               ),
-              Obx(
-                () => Text(
-                  '${Get.find<TaskController>().tasks.length} Tasks ',
-                  style: const TextStyle(color: Colors.white),
-                ),
+              GetBuilder<TaskController>(
+                init: TaskController(),
+                initState: (_) {},
+                builder: (_) {
+                  return Text(
+                    '${Get.find<TaskController>().tasks.length} Tasks',
+                    style: const TextStyle(color: Colors.white),
+                  );
+                },
               ),
             ],
           ),
